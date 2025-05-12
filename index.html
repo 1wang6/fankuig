@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>意见反馈平台</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* 确保内边距和边框包含在宽度内 */
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .faq-section {
+            margin-top: 30px;
+        }
+        .faq-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .faq-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .progress-section {
+            margin-top: 20px;
+        }
+        .progress-status {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 4px;
+            color: #155724;
+        }
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+        .language-select {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .language-select label {
+            margin-right: 5px;
+            color: #555;
+            font-size: 14px;
+        }
+        .language-select select {
+            width: auto;
+            padding: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 语言切换功能 -->
+    <div class="language-select">
+        <label for="language">Language:</label>
+        <select id="language" name="language" onchange="changeLanguage()">
+            <option value="zh-CN">中文</option>
+            <option value="en-US">English</option>
+            <option value="ja-JP">日本語</option>
+            <option value="ko-KR">한국어</option>
+        </select>
+    </div>
+    
+    <h1 id="page-title">意见反馈平台</h1>
+    
+    <!-- 反馈者基本信息区 -->
+    <label for="name" id="name-label">姓名：</label>
+    <input type="text" id="name" name="name" required>
+    <div id="name-error" class="error-message"></div>
+    
+    <label for="contact" id="contact-label">联系方式（手机号码或电子邮箱）：</label>
+    <input type="text" id="contact" name="contact" required>
+    <div id="contact-error" class="error-message"></div>
+    
+    <label for="identity" id="identity-label">反馈者身份：</label>
+    <select id="identity" name="identity">
+        <option value="普通使用者">普通使用者</option>
+        <option value="视障群体家属">视障群体家属</option>
+        <option value="专业人士">专业人士（康复师、盲人学校教师等）</option>
+    </select>
+    
+    <!-- 反馈主题与类型选择区 -->
+    <label for="subject" id="subject-label">反馈主题：</label>
+    <input type="text" id="subject" name="subject" required>
+    <div id="subject-error" class="error-message"></div>
+    
+    <label for="type" id="type-label">反馈类型：</label>
+    <select id="type" name="type">
+        <option value="功能问题">功能问题</option>
+        <option value="使用体验">使用体验</option>
+        <option value="产品质量">产品质量</option>
+        <option value="新功能建议">新功能建议</option>
+    </select>
+    
+    <!-- 详细反馈内容区 -->
+    <label for="details" id="details-label">详细反馈内容：</label>
+    <textarea id="details" name="details" rows="5" required></textarea>
+    <p style="color: #777;" id="details-description">请尽可能详细描述问题，这有助于我们更快解决您的困扰。</p>
+    <div id="details-error" class="error-message"></div>
+    
+    <!-- 上传附件区 -->
+    <label for="attachment" id="attachment-label">上传附件：</label>
+    <input type="file" id="attachment" name="attachment" accept=".jpg,.jpeg,.png,.mp4,.pdf">
+    
+    <!-- 提交按钮 -->
+    <button onclick="submitFeedback()" id="submit-button">提交反馈</button>
+    
+    <!-- 反馈进度展示区 -->
+    <div class="progress-section">
+        <h2 id="progress-title">反馈进度</h2>
+        <div id="progress-status" class="progress-status">尚未提交记录</div>
+    </div>
+    
+    <!-- 常见问题解答（FAQ）板块 -->
+    <div class="faq-section">
+        <h2 id="faq-title">常见问题解答</h2>
+        <ul class="faq-list">
+            <li class="faq-item"><strong id="faq-question-1">如何校准导盲杖的定位功能？</strong><br id="faq-answer-1">请参考用户手册中的校准步骤，或者联系客服获取帮助。</li>
+            <li class="faq-item"><strong id="faq-question-2">导盲杖充电时间过长怎么办？</strong><br id="faq-answer-2">检查充电线和电源插座是否正常工作，确保电池无损坏。</li>
+        </ul>
+    </div>
+    
+    <!-- 搜索功能 -->
+    <label for="search" id="search-label">搜索反馈：</label>
+    <input type="text" id="search" name="search" placeholder="输入关键词...">
+</div>
+
+<script>
+    const translations = {
+        "zh-CN": {
+            "page-title": "意见反馈平台",
+            "name-label": "姓名：",
+            "contact-label": "联系方式（手机号码或电子邮箱）：",
+            "identity-label": "反馈者身份：",
+            "subject-label": "反馈主题：",
+            "type-label": "反馈类型：",
+            "details-label": "详细反馈内容：",
+            "details-description": "请尽可能详细描述问题，这有助于我们更快解决您的困扰。",
+            "attachment-label": "上传附件：",
+            "submit-button": "提交反馈",
+            "progress-title": "反馈进度",
+            "progress-status": "尚未提交记录",
+            "faq-title": "常见问题解答",
+            "faq-question-1": "如何校准导盲杖的定位功能？",
+            "faq-answer-1": "请参考用户手册中的校准步骤，或者联系客服获取帮助。",
+            "faq-question-2": "导盲杖充电时间过长怎么办？",
+            "faq-answer-2": "检查充电线和电源插座是否正常工作，确保电池无损坏。",
+            "search-label": "搜索反馈："
+        },
+        "en-US": {
+            "page-title": "Feedback Platform",
+            "name-label": "Name:",
+            "contact-label": "Contact Information (Phone Number or Email):",
+            "identity-label": "Your Identity:",
+            "subject-label": "Feedback Subject:",
+            "type-label": "Feedback Type:",
+            "details-label": "Detailed Feedback Content:",
+            "details-description": "Please provide as much detail as possible so we can resolve your issue faster.",
+            "attachment-label": "Upload Attachment:",
+            "submit-button": "Submit Feedback",
+            "progress-title": "Feedback Progress",
+            "progress-status": "Submitted, awaiting processing",
+            "faq-title": "Frequently Asked Questions",
+            "faq-question-1": "How do I calibrate the orientation function of my cane?",
+            "faq-answer-1": "Please refer to the calibration steps in the user manual or contact customer service for assistance.",
+            "faq-question-2": "Why does my cane take a long time to charge?",
+            "faq-answer-2": "Check if the charging cable and power outlet are working properly and ensure that the battery is not damaged.",
+            "search-label": "Search Feedback:"
+        },
+        "ja-JP": {
+            "page-title": "フィードバックプラットフォーム",
+            "name-label": "名前：",
+            "contact-label": "連絡先情報（電話番号またはメールアドレス）：",
+            "identity-label": "あなたの身分：",
+            "subject-label": "フィードバックテーマ：",
+            "type-label": "フィードバックタイプ：",
+            "details-label": "詳細なフィードバック内容：",
+            "details-description": "問題をより早く解決するために可能な限り詳しく記述してください。",
+            "attachment-label": "添付ファイルのアップロード：",
+            "submit-button": "フィードバックを送信",
+            "progress-title": "フィードバックの進捗状況",
+            "progress-status": "送信済み、処理待ち",
+            "faq-title": "よくある質問",
+            "faq-question-1": "ホワイトキャンーの方向付け機能はどのように調整しますか？",
+            "faq-answer-1": "ユーザーマニュアルの調整手順をご覧ください、またはカスタマーサービスにご相談ください。",
+            "faq-question-2": "ホワイトキャンーの充電時間が長くかかりますとどうすればいいですか？",
+            "faq-answer-2": "チャージケーブルやパワーソケットが正しく動作していることを確認し、バッテリーが損傷していないことを確認してください。",
+            "search-label": "フィードバックを検索："
+        },
+        "ko-KR": {
+            "page-title": "피드백 플랫폼",
+            "name-label": "이름:",
+            "contact-label": "연락처 정보 (전화번호 또는 이메일):",
+            "identity-label": "당신의 신분:",
+            "subject-label": "피드백 주제:",
+            "type-label": "피드백 유형:",
+            "details-label": "자세한 피드백 내용:",
+            "details-description": "문제를 더 빨리 해결하기 위해 가능한 한 자세히 설명해 주세요.",
+            "attachment-label": "첨부 파일 업로드:",
+            "submit-button": "피드백 제출",
+            "progress-title": "피드백 진행 상황",
+            "progress-status": "제출됨, 처리 대기 중",
+            "faq-title": "자주 묻는 질문",
+            "faq-question-1": "보조막대의 방향 조정 기능은 어떻게 설정합니까?",
+            "faq-answer-1": "사용자 매뉴얼에서 조정 단계를 참조하거나 고객 서비스에 문의하세요.",
+            "faq-question-2": "보조막대 충전 시간이 오래 걸릴 경우 어떻게 하나요?",
+            "faq-answer-2": "충전 케이블과 전원 소켓이 제대로 작동하는지 확인하고 배터리가 손상되지 않았는지 확인하세요.",
+            "search-label": "피드백 검색:"
+        }
+    };
+
+    function changeLanguage() {
+        const selectedLanguage = document.getElementById('language').value;
+        const translation = translations[selectedLanguage];
+
+        document.getElementById('page-title').innerText = translation["page-title"];
+        document.getElementById('name-label').innerText = translation["name-label"];
+        document.getElementById('contact-label').innerText = translation["contact-label"];
+        document.getElementById('identity-label').innerText = translation["identity-label"];
+        document.getElementById('subject-label').innerText = translation["subject-label"];
+        document.getElementById('type-label').innerText = translation["type-label"];
+        document.getElementById('details-label').innerText = translation["details-label"];
+        document.getElementById('details-description').innerText = translation["details-description"];
+        document.getElementById('attachment-label').innerText = translation["attachment-label"];
+        document.getElementById('submit-button').innerText = translation["submit-button"];
+        document.getElementById('progress-title').innerText = translation["progress-title"];
+        document.getElementById('progress-status').innerText = translation["progress-status"];
+        document.getElementById('faq-title').innerText = translation["faq-title"];
+        document.getElementById('faq-question-1').innerText = translation["faq-question-1"];
+        document.getElementById('faq-answer-1').innerText = translation["faq-answer-1"];
+        document.getElementById('faq-question-2').innerText = translation["faq-question-2"];
+        document.getElementById('faq-answer-2').innerText = translation["faq-answer-2"];
+        document.getElementById('search-label').innerText = translation["search-label"];
+
+        // Update dropdown options
+        const identityOptions = document.getElementById('identity').options;
+        identityOptions[0].text = translation["identity-option-1"] || identityOptions[0].text;
+        identityOptions[1].text = translation["identity-option-2"] || identityOptions[1].text;
+        identityOptions[2].text = translation["identity-option-3"] || identityOptions[2].text;
+
+        const typeOptions = document.getElementById('type').options;
+        typeOptions[0].text = translation["type-option-1"] || typeOptions[0].text;
+        typeOptions[1].text = translation["type-option-2"] || typeOptions[1].text;
+        typeOptions[2].text = translation["type-option-3"] || typeOptions[2].text;
+        typeOptions[3].text = translation["type-option-4"] || typeOptions[3].text;
+    }
+
+    function submitFeedback() {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.getElementById('name-error').innerText = '';
+        document.getElementById('contact-error').innerText = '';
+        document.getElementById('subject-error').innerText = '';
+        document.getElementById('details-error').innerText = '';
+
+        // Validate name
+        const name = document.getElementById('name').value.trim();
+        if (name === '') {
+            document.getElementById('name-error').innerText = translations[document.getElementById('language').value]["name-label"].replace(':', '').trim() + ' is required';
+            isValid = false;
+        }
+
+        // Validate contact information
+        const contact = document.getElementById('contact').value.trim();
+        if (contact === '') {
+            document.getElementById('contact-error').innerText = translations[document.getElementById('language').value]["contact-label"].replace(':', '').trim() + ' is required';
+            isValid = false;
+        }
+
+        // Validate feedback subject
+        const subject = document.getElementById('subject').value.trim();
+        if (subject === '') {
+            document.getElementById('subject-error').innerText = translations[document.getElementById('language').value]["subject-label"].replace(':', '').trim() + ' is required';
+            isValid = false;
+        }
+
+        // Validate detailed feedback content
+        const details = document.getElementById('details').value.trim();
+        if (details === '') {
+            document.getElementById('details-error').innerText = translations[document.getElementById('language').value]["details-label"].replace(':', '').trim() + ' is required';
+            isValid = false;
+        }
+
+        if (isValid) {
+            // Here you can add logic to submit the feedback
+            document.getElementById('progress-status').innerText = translations[document.getElementById('language').value]["progress-status"];
+        }
+    }
+
+    // Initialize language on page load
+    window.onload = function() {
+        changeLanguage();
+    };
+</script>
+
+</body>
+</html>
+
+
+
